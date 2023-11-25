@@ -129,6 +129,11 @@ func main() {
 	// e.Use(middleware.Recover())
 
 	// 初期化
+	err := initTagMap()
+	if err != nil {
+		e.Logger.Errorf("failed to init tag map: %v", err)
+		os.Exit(1)
+	}
 	e.POST("/api/initialize", initializeHandler)
 
 	// top
