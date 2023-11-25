@@ -494,13 +494,13 @@ func initTagMap() error {
 	if err != nil {
 		return err
 	}
-	var data []Tag
+	var data TagsResponse
 	err = json.Unmarshal(text, &data)
 	if err != nil {
 		return err
 	}
 	tagmap = map[int64]string{}
-	for _, tag := range data {
+	for _, tag := range data.Tags {
 		tagmap[tag.ID] = tag.Name
 	}
 	return nil
