@@ -148,9 +148,9 @@ func postIconHandler(c echo.Context) error {
 
 	iconHash := sha256.Sum256(req.Image)
 	iconHashStr := fmt.Sprintf("%x", iconHash)
-	iconPath := fmt.Sprintf("icons/%d.dat", iconHashStr)
+	iconPath := fmt.Sprintf("icons/%s.dat", iconHashStr)
 
-	f, err := os.Create(iconPath)
+	f, _ := os.Create(iconPath)
 	f.Write(req.Image)
 
 	tx, err := dbConn.BeginTxx(ctx, nil)
