@@ -118,6 +118,9 @@ func getIconHandler(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user icon: "+err.Error())
 		}
 	}
+	if c.Request().Header.Get("If-None-Match") == icon.IconHash {
+		return c.NoContent(http.StatusNotModified)
+	}
 
 	image, err := os.ReadFile(icon.ImagePath)
 	if err != nil {
