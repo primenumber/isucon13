@@ -8,7 +8,6 @@ app:
 
 deploy-app: app nginx-log-rotate
 	scp -r webapp/go isucon@$(ADDR):/home/isucon/webapp/
-	scp webapp/docker-compose-go.yml isucon@$(ADDR):/home/isucon/webapp/
 	ssh isucon@$(ADDR) sudo systemctl restart isupipe-go.service
 
 deploy-nginx-only: nginx-log-rotate
