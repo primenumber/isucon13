@@ -214,6 +214,8 @@ func searchLivestreamsHandler(c echo.Context) error {
 				return echo.NewHTTPError(http.StatusBadRequest, "limit query parameter must be integer")
 			}
 			query += fmt.Sprintf(" LIMIT %d", limit)
+		} else {
+			query += " LIMIT 10"
 		}
 
 		if err := tx.SelectContext(ctx, &livestreamModels, query); err != nil {
