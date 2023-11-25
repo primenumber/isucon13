@@ -18,10 +18,11 @@ mysql-log-rotate:
 	ssh isucon@$(ADDR) "sudo rm /var/log/mysql/mysql-slow.log ; sudo systemctl restart mysql"
 
 get-mysql-log:
+	ssh isucon@$(ADDR) 'sudo chmod 644 /var/log/mysql/mysql-slow.log'
 	scp isucon@$(ADDR):/var/log/mysql/mysql-slow.log /tmp
 
 pt-query-digest:
-	pt-query-digest /tmp/mysql-slow.log
+	pt-query-digest /tmp/mysql-slow.log | tee /tmp/digest_$(date +%Y%m%d-%H%M%S).txt
 
 deploy-nginx-only: nginx-log-rotate
 	scp -r etc/nginx isucon@$(ADDR):/tmp
