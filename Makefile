@@ -5,7 +5,7 @@ ADDR := 52.69.211.251
 app:
 	cd webapp/go; GOOS=linux GOARCH=amd64 go build -o isupipe
 
-deploy-app: app nginx-log-rotate
+deploy-app: app nginx-log-rotate mysql-log-rotate
 	ssh isucon@$(ADDR) rm /home/isucon/webapp/go/isupipe
 	scp -r webapp/go isucon@$(ADDR):/home/isucon/webapp/
 	ssh isucon@$(ADDR) sudo systemctl restart isupipe-go.service
