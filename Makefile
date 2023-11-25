@@ -22,7 +22,7 @@ get-mysql-log:
 	scp isucon@$(ADDR):/var/log/mysql/mysql-slow.log /tmp
 
 pt-query-digest:
-	pt-query-digest /tmp/mysql-slow.log | tee /tmp/digest_$(date +%Y%m%d-%H%M%S).txt
+	pt-query-digest /tmp/mysql-slow.log | tee /tmp/digest.txt.`date +%Y%m%d-%H%M%S`
 
 deploy-nginx-only: nginx-log-rotate
 	scp -r etc/nginx isucon@$(ADDR):/tmp
