@@ -129,6 +129,7 @@ func main() {
 	// e.Use(middleware.Recover())
 
 	// 初期化
+	initTagMap()
 	e.POST("/api/initialize", initializeHandler)
 
 	// top
