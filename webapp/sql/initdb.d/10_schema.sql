@@ -15,7 +15,8 @@ CREATE TABLE `icons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT NOT NULL,
   `image_path` VARCHAR(255) NOT NULL,
-  `icon_hash` VARCHAR(255) NOT NULL
+  `icon_hash` VARCHAR(255) NOT NULL,
+  INDEX idx_us_id (user_id)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 -- ユーザごとのカスタムテーマ
