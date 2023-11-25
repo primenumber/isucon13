@@ -110,7 +110,12 @@ func getIconHandler(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user icon: "+err.Error())
 		}
 	}
-	if c.Request().Header.Get("If-None-Match") == icon.IconHash {
+
+	if err := tx.Commit(); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
+	}
+
+	if c.Request().Header.Get("If-None-Match") == fmt.Sprintf("\"%s\"", icon.IconHash) {
 		return c.NoContent(http.StatusNotModified)
 	}
 

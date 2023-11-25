@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -214,6 +215,8 @@ func searchLivestreamsHandler(c echo.Context) error {
 				return echo.NewHTTPError(http.StatusBadRequest, "limit query parameter must be integer")
 			}
 			query += fmt.Sprintf(" LIMIT %d", limit)
+		} else {
+			query += " LIMIT 10"
 		}
 
 		if err := tx.SelectContext(ctx, &livestreamModels, query); err != nil {
@@ -484,6 +487,36 @@ func getLivecommentReportsHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, reports)
 }
 
+var tagmap map[int64]string
+
+func initTagMap() error {
+	text, err := ioutil.ReadFile("tags.json")
+	if err != nil {
+		return err
+	}
+	var data TagsResponse
+	err = json.Unmarshal(text, &data)
+	if err != nil {
+		return err
+	}
+	tagmap = map[int64]string{}
+	for _, tag := range data.Tags {
+		tagmap[tag.ID] = tag.Name
+	}
+	return nil
+}
+
+func fillTagModels(ctx context.Context, tx *sqlx.Tx, ids []int64) ([]Tag, error) {
+	tags := make([]Tag, len(ids))
+	for i, id := range ids {
+		tags[i] = Tag{
+			ID:   id,
+			Name: tagmap[id],
+		}
+	}
+	return tags, nil
+}
+
 func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel LivestreamModel) (Livestream, error) {
 	ownerModel := UserModel{}
 	if err := tx.GetContext(ctx, &ownerModel, "SELECT * FROM users WHERE id = ?", livestreamModel.UserID); err != nil {
@@ -499,17 +532,13 @@ func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel Li
 		return Livestream{}, err
 	}
 
-	tags := make([]Tag, len(livestreamTagModels))
+	tag_ids := make([]int64, len(livestreamTagModels))
 	for i := range livestreamTagModels {
-		tagModel := TagModel{}
-		if err := tx.GetContext(ctx, &tagModel, "SELECT * FROM tags WHERE id = ?", livestreamTagModels[i].TagID); err != nil {
-			return Livestream{}, err
-		}
-
-		tags[i] = Tag{
-			ID:   tagModel.ID,
-			Name: tagModel.Name,
-		}
+		tag_ids[i] = livestreamTagModels[i].TagID
+	}
+	tags, err := fillTagModels(ctx, tx, tag_ids)
+	if err != nil {
+		return Livestream{}, err
 	}
 
 	livestream := Livestream{
