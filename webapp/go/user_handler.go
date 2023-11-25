@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -120,7 +119,7 @@ func getIconHandler(c echo.Context) error {
 		}
 	}
 
-	image, err := ioutil.ReadFile(icon.ImagePath)
+	image, err := os.ReadFile(icon.ImagePath)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user icon: "+err.Error())
 	}
