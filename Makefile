@@ -10,9 +10,18 @@ deploy-app: app nginx-log-rotate
 	scp -r webapp/go isucon@$(ADDR):/home/isucon/webapp/
 	ssh isucon@$(ADDR) sudo systemctl restart isupipe-go.service
 
-deploy-mysql-only:
+deploy-mysql-only: mysql-log-rotate
 	scp -r etc/mysql isucon@$(ADDR):/tmp
 	ssh isucon@$(ADDR) 'sudo cp -rT /tmp/mysql /etc/mysql ; sudo systemctl restart mysql'
+
+mysql-log-rotate:
+	ssh isucon@$(ADDR) "sudo rm /var/log/mysql/mysql-slow.log ; sudo systemctl restart mysql"
+
+get-mysql-log:
+	scp isucon@$(ADDR):/var/log/mysql/mysql-slow.log /tmp
+
+pt-query-digest:
+	pt-query-digest /tmp/mysql-slow.log
 
 deploy-nginx-only: nginx-log-rotate
 	scp -r etc/nginx isucon@$(ADDR):/tmp
